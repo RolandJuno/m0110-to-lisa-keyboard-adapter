@@ -72,14 +72,15 @@ uint8_t M0110_DATA_BIT;
 
 //Grab the state of the CABLE pin to determine what keyboard cable is in use - NEW
 static inline void determine_keyboard_cable() {
-    if (digitalRead(kbd_cable_type_pin) == HIGH) {
+    //if (digitalRead(kbd_cable_type_pin) == HIGH) { // Paul: I think this should be LOW,pin is pulled up. DIP open is HIGH, DIP closed is to GND
+    if (digitalRead(kbd_cable_type_pin) == LOW) {
         //We're using a standard telephone handset cable
-        M0110_CLOCK_BIT = 0;
-        M0110_DATA_BIT = 1;
+        M0110_CLOCK_BIT = 0; // PORTD0 is Pin 6
+        M0110_DATA_BIT = 1;  // PORTD1 is Pin 5
     } else {
         //We're using a Macintosh keyboard cable
-        M0110_CLOCK_BIT = 1;
-        M0110_DATA_BIT = 0;
+        M0110_CLOCK_BIT = 1; // PORTD1 is Pin 5
+        M0110_DATA_BIT = 0;  // PORTD0 is Pin 6
     }
 }
 
@@ -330,8 +331,23 @@ uint8_t m0110_recv_key(void)
 }
 
 
-static inline uint8_t raw2scan(uint8_t raw)
+uint8_t raw2scan(uint8_t raw)
 {
+    // Hack to swap the T and Y keys (by Paul Rickards) Oct 29, 2023
+    switch (raw) {
+      case 0x23:
+        return 0x10;
+        break;
+      case 0xA3:
+        return 0x90;
+        break;
+      case 0x21:
+        return 0x11;
+        break;
+      case 0xA1:
+        return 0x91;
+        break;
+    }
     return (raw == M0110_NULL) ? M0110_NULL : ((raw == M0110_ERROR) ? M0110_ERROR : (((raw&0x80) | ((raw & 0x7F) >> 1))));
 }
 
