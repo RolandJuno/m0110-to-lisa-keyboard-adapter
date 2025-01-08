@@ -156,7 +156,7 @@ void lk_delay(unsigned long ms) {
 // These have been adjusted to work with a real Lisa.
 #define LK_PACKET_OUT_DELAY 10
 #define LK_PACKET_OUT_START 15
-#define LK_PACKET_OUT_SHORT 15
+#define LK_PACKET_OUT_SHORT 16 // +1 from original, otherwise half of the keys are wrong
 #define LK_PACKET_OUT_LONG  30
 #define LK_PACKET_OUT_STOP  15
 
